@@ -16,13 +16,15 @@ console.log(output);
 console.log('The center is:');
 console.log(centerFromTile(i.z,i.x,i.y));
 console.log('tile2Long', tile2long(i.x,i.z))
-console.log('tile2Lat', tile2lat(i.y,i.z))
+console.log('tile2Lat', tile2lat(3,2))
 
 
 function tile2long(x,z) { return (x/Math.pow(2,z)*360-180); }
 
 function tile2lat(y,z) {
-    var n=Math.PI-2*Math.PI*(y-0.5)/Math.pow(2,z);
+    var n=Math.PI-2*Math.PI*(y)/Math.pow(2,z);
+    var delta = n >= 0 ? 0.5 : -0.5
+    n=Math.PI-2*Math.PI*(y-delta)/Math.pow(2,z);
     return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
 }
 

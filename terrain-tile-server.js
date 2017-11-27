@@ -88,8 +88,10 @@ function makeTile (fileDir, z, x, y, cb) {
 	
 	var mag =  ((planetCircumfence) / cmPerTile) / scalingFactors[z]
 	if(+z >= 1) {
-		var delta = latCenter > 0 ? -0.5 : 0.5
-		latCenter = tile2lat(y,z,delta)
+		// var delta = latCenter > 0 ? -0.5 : 0.5
+		// console.log(z,y,delta,y-delta, latCenter)
+		latCenter = tile2lat(y,z)
+		//onsole.log(z,y,delta,y-delta, latCenter)
 
 	}
 	
@@ -139,11 +141,20 @@ function ensureExists(path, mask, cb) {
 app.listen(3333, () => console.log('Planet tile generator listening on port 3333!'))
 
 ///-------------------Map Calculating things----------------------------------------
-
-function tile2lat(y,z,delta) {
-	console.log(delta,y-delta)
-    var n=Math.PI-2*Math.PI*(y-delta)/Math.pow(2,z);
-    var mult = delta > 0 ? -1 : 1
-    return mult * (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
-   
+function tile2lat(y,z) {
+	var tilesPerSide = Math.sqrt(Math.pow(4,z))
+    var n=Math.PI-2*Math.PI*(y)/Math.pow(2,z);
+    console.log('y,z',y,z, y / tilesPerSide )
+    var delta = n >= 0 || y / tilesPerSide > 0.51  ? -0.5 : 0.5
+     console.log('y,z',y,z, y / tilesPerSide, delta, y-delta )
+    n=Math.PI-2*Math.PI*(y-delta)/Math.pow(2,z);
+    return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
 }
+
+// function tile2lat(y,z,delta) {
+	
+//     var n=Math.PI-2*Math.PI*(y-delta)/Math.pow(2,z);
+//     var mult = delta > 0 ? -1 : 1
+//     return mult * Math.abs(180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
+   
+// }
