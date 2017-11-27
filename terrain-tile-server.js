@@ -144,9 +144,7 @@ app.listen(3333, () => console.log('Planet tile generator listening on port 3333
 function tile2lat(y,z) {
 	var tilesPerSide = Math.sqrt(Math.pow(4,z))
     var n=Math.PI-2*Math.PI*(y)/Math.pow(2,z);
-    console.log('y,z',y,z, y / tilesPerSide )
     var delta = n >= 0 || y / tilesPerSide > 0.51  ? -0.5 : 0.5
-     console.log('y,z',y,z, y / tilesPerSide, delta, y-delta )
     n=Math.PI-2*Math.PI*(y-delta)/Math.pow(2,z);
     return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
 }
