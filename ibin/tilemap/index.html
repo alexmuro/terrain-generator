@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Zoom Levels Tutorial - Leaflet</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+
+	
+</head>
+<body>
+
+<div id='map'></div>
+
+<script>
+
+	var map = L.map('map', {
+		minZoom: 0,
+		maxZoom: 18,
+		zoomSnap: 0,
+		zoomDelta: 1
+	});
+
+
+	var positron = L.tileLayer('http://localhost:3333/ibin/{z}/{x}/{y}.png', {
+		
+	}).addTo(map);
+
+	var ZoomViewer = L.Control.extend({
+		onAdd: function(){
+
+			var container= L.DomUtil.create('div');
+			var gauge = L.DomUtil.create('div');
+			container.style.width = '200px';
+			container.style.background = 'rgba(255,255,255,0.5)';
+			container.style.textAlign = 'left';
+			map.on('zoomstart zoom zoomend', function(ev){
+				gauge.innerHTML = 'Zoom level: ' + map.getZoom();
+			})
+			container.appendChild(gauge);
+
+			return container;
+		}
+	});
+
+	(new ZoomViewer).addTo(map);
+
+	map.setView([0, 0], 0);
+</script>
+
+
+
+</body>
+</html>

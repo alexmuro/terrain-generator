@@ -1,0 +1,15 @@
+{
+  "name": "terrain-tile-server",
+  "version": "1.0.0",
+  "description": "ReadMe file for the planet generating program \"Planet\". Copyright 1988-2009 Torben �. Mogensen",
+  "main": "terrain-tile-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "mkdirp": "^0.5.1"
+  }
+}
