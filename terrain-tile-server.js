@@ -67,28 +67,33 @@ function makeTile (fileDir, z, x, y, cb) {
 	var planetCircumfence = 4.0075e9 
 	var cmPerTile = 6.77
 	var tilesPerSide = Math.sqrt(Math.pow(4,z))
+	
+	//calculate longitudinal center
 	var lonDegPerTile = (360 / tilesPerSide)
 	var lonCenter = (lonDegPerTile * x) + (lonDegPerTile/2) - 180
+
+	//calculate latitudinal center
 	var latApprox = (170 / tilesPerSide)
-	var latMetersPerTile = (planetCircumfence / 2) / tilesPerSide
-	var latDegPerTile = metersToLatLng([0,latMetersPerTile])[1] //(180 / tilesPerSide)
-	console.log('latDegPerTile', latDegPerTile, (170 / tilesPerSide))
-	var ySwitch = tilesPerSide - y - 1
-	var nlatCenter = (latApprox * ySwitch) + (latDegPerTile/2) - 85
-	var latCenter = nlatCenter
+	var latDegPerTile = (planetCircumfence / 2) / tilesPerSide
+	//var latDegPerTile = metersToLatLng([0,latMetersPerTile])[1] //(180 / tilesPerSide)
 	
-	metersToLatLng([0,latMetersPerTile])[1]
-	//latCenter =
-	//var latCenter =  180 / Math.PI * (2 * Math.atan( Math.exp( nlatCenter * Math.PI / 180.0)) - Math.PI / 2.0)
-	var mag =  (planetCircumfence / cmPerTile) /  ( planetCircumfence / tilesPerSide) /// scalingFactors[z] ) 
-	var LatWidth = (1/Math.cos(nlatCenter))
-	var latMag =  ((planetCircumfence) / cmPerTile) / scalingFactors[z]
-	console.log('scaling', z, scalingFactors[z] , ( planetCircumfence / tilesPerSide))
-	console.log('mag',  mag, latMag, LatWidth)
-	// var latLngCenter = centerFromTile(z, x, y)
-	// divide 4x10^9 by the width of the map (in centimeters) and then by the
-	// magnification factor
-	console.log('z,y,x,lonCenter,latCenter,mag', z, ySwitch, x, lonCenter, latCenter)
+	var ySwitch = tilesPerSide - y - 1
+	var latCenter = (latApprox * ySwitch) + (latApprox/2) - 85
+	
+	
+	// metersToLatLng([0,latMetersPerTile])[1]
+	// latCenter =
+	// var latCenter =  180 / Math.PI * (2 * Math.atan( Math.exp( nlatCenter * Math.PI / 180.0)) - Math.PI / 2.0)
+	// var LatWidth = (1/Math.cos(nlatCenter))
+	
+	var mag =  ((planetCircumfence) / cmPerTile) / scalingFactors[z]
+	if(+z >= 1) {
+		latCenter = latCenter * 1.57 
+		latCenter = tile2lat(y,z)
+		
+	}
+	
+	console.log('z,y,x,lonCenter,latCenter,mag', z, ySwitch, x, lonCenter, latCenter,mag)
 
 	var tileCommand = `./planet \
 		-T 0 25 -s .15465831 \
@@ -96,7 +101,7 @@ function makeTile (fileDir, z, x, y, cb) {
 		-i -0.044 -S \
 		-C ./Lefebvre2.col \
 		-c -c -c \
-		-m ${latMag} \
+		-m ${mag} \
 		-l ${lonCenter} \
 		-L ${latCenter } | convert - ${fileDir}${y}.png`
 	mkdirp(fileDir, function(err) {
@@ -135,44 +140,7 @@ app.listen(3333, () => console.log('Planet tile generator listening on port 3333
 
 ///-------------------Map Calculating things----------------------------------------
 
-function centerFromTile(z,x,y) {
-  var bounds = tileBounds(z,x,y);
-    mins = metersToLatLng(bounds[0]);
-    maxs = metersToLatLng(bounds[1]);
-    console.log('yyy', mins,maxs, bounds[0], bounds[1])
-    mins[0] +=180
-    maxs[0] +=180
-    mins[1] += 90
-    maxs[1] += 90
-       
-    bounds = [ ((maxs[1] + mins[1]) / 2) - 90 , ((maxs[0] + mins[0]) /2) - 180 ]
-
-    return bounds;
-}
-
-function metersToLatLng(coord) {
-	var planetCircumfence = 4.0075e9 
-  var lng = (coord[0] / (planetCircumfence / 2.0)) * 180.0
-  console.log('coord1', coord[1])
-  var lat = (coord[1] / (planetCircumfence / 2.0)) * 180.0
-  var lat = 180 / Math.PI * (2 * Math.atan( Math.exp( lat * Math.PI / 180.0)) - Math.PI / 2.0)
-  console.log('lat')
-  return [lng,lat]
-}
-
-
-function tileBounds(z,x,y) {
-  var mins = pixelsToMeters( z, x*256, (y+1)*256 )
-  var maxs = pixelsToMeters( z, (x+1)*256, y*256 )
-      
-  return [mins,maxs];
-}
-
-
-function pixelsToMeters(z,x,y) {
-  var res = (2 * Math.PI * 6378137 / 256) / (Math.pow(2,z));
-  mx = x * res - (2 * Math.PI * 6378137 / 2.0);
-  my = y * res - (2 * Math.PI * 6378137 / 2.0);
-  my = -my;
-  return [mx, my];
+function tile2lat(y,z) {
+    var n=Math.PI-2*Math.PI*(y-0.5)/Math.pow(2,z);
+    return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
 }
