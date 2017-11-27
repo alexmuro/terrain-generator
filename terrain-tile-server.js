@@ -88,9 +88,9 @@ function makeTile (fileDir, z, x, y, cb) {
 	
 	var mag =  ((planetCircumfence) / cmPerTile) / scalingFactors[z]
 	if(+z >= 1) {
-		latCenter = latCenter * 1.57 
-		latCenter = tile2lat(y,z)
-		
+		var delta = latCenter > 0 ? -0.5 : 0.5
+		latCenter = tile2lat(y,z,delta)
+
 	}
 	
 	console.log('z,y,x,lonCenter,latCenter,mag', z, ySwitch, x, lonCenter, latCenter,mag)
@@ -140,7 +140,10 @@ app.listen(3333, () => console.log('Planet tile generator listening on port 3333
 
 ///-------------------Map Calculating things----------------------------------------
 
-function tile2lat(y,z) {
-    var n=Math.PI-2*Math.PI*(y-0.5)/Math.pow(2,z);
-    return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
+function tile2lat(y,z,delta) {
+	console.log(delta,y-delta)
+    var n=Math.PI-2*Math.PI*(y-delta)/Math.pow(2,z);
+    var mult = delta > 0 ? -1 : 1
+    return mult * (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
+   
 }
